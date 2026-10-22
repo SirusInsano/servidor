@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="DragonToons — seu portal para animes, mangás e manhwas. Encontre sua próxima história em um universo inspirado em Tempest.">
+    <meta name="theme-color" content="#0c1016">
+    <meta name="color-scheme" content="dark">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:title" content="DragonToons — Histórias de outro mundo">
+    <meta property="og:description" content="Animes, mangás e manhwas. Um universo inteiro para explorar.">
+    <meta property="og:image" content="imagens/tempest-hero.png">
+    <title>DragonToons — Histórias de outro mundo</title>
+    <link rel="icon" href="imagens/dragon-mark.svg" type="image/svg+xml">
+    <link rel="preload" href="fontes/dm-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fontes/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="imagens/tempest-hero.png" as="image" fetchpriority="high">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="site-home">
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="index.html" aria-label="DragonToons — início">
+                <img src="imagens/dragon-mark.svg" alt="" width="40" height="40">
+                <span class="brand-name">DRAGON<span>TOONS</span><small>HISTÓRIAS DE OUTRO MUNDO</small></span>
+            </a>
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-principal">
+                <span class="nav-toggle-bar" aria-hidden="true"></span><span class="nav-toggle-bar" aria-hidden="true"></span><span class="nav-toggle-bar" aria-hidden="true"></span>
+                <span class="sr-only">Abrir menu de navegação</span>
+            </button>
+            <nav id="nav-principal" aria-label="Navegação principal">
+                <ul>
+                    <li><a href="#home" aria-current="page">Início</a></li>
+                    <li><a href="leitor.html">Catálogo</a></li>
+                    <li><a href="#animes">Animes</a></li>
+                    <li><a href="#manhwas">Manhwas</a></li>
+                </ul>
+            </nav>
+            <a class="header-reader" href="leitor.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5c4-1 6 0 9 2 3-2 5-3 9-2v14c-4-1-6 0-9 2-3-2-5-3-9-2V5Zm9 2v14"/></svg>Abrir leitor<span aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a>
+        </div>
+    </header>
+
+    <main id="conteudo">
+        <section id="home" class="hero" aria-labelledby="hero-titulo">
+            <img class="hero-art" src="imagens/tempest-hero.png" alt="Rimuru, um pequeno slime azul e o dragão Veldora diante da cidade de Tempest." width="1672" height="941" fetchpriority="high">
+            <div class="hero-shade" aria-hidden="true"></div>
+            <div class="container hero-inner">
+                <div class="hero-copy">
+                    <p class="eyebrow"><span class="tiny-star" aria-hidden="true">✦</span> SEU PORTAL PARA NOVOS MUNDOS</p>
+                    <h1 id="hero-titulo">O próximo capítulo<br>é de <em>outro mundo.</em></h1>
+                    <p class="hero-description">De um pequeno slime a um dragão lendário.<br>Grandes histórias começam com uma nova descoberta.</p>
+                    <div class="hero-actions">
+                        <a class="btn" href="leitor.html">Explorar catálogo <span aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a>
+                        <a class="btn-ghost" href="#animes"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 10 7-10 7V5Z"/></svg>Ver destaques</a>
+                    </div>
+                    <div class="hero-types"><span>ANIMES</span><i aria-hidden="true"></i><span>MANGÁS</span><i aria-hidden="true"></i><span>MANHWAS</span></div>
+                </div>
+                <a class="hero-feature" href="leitor.html?busca=Tensei%20Shitara%20Slime&tipo=anime">
+                    <span class="feature-line" aria-hidden="true"></span>
+                    <span><small>UM UNIVERSO PARA EXPLORAR</small><strong>Rimuru &amp; Veldora</strong><span>Tensei Shitara Slime Datta Ken</span></span>
+                    <span class="feature-arrow" aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span>
+                </a>
+            </div>
+            <div class="hero-coordinate" aria-hidden="true">01 / TEMPEST</div>
+        </section>
+
+        <section id="busca-inicio" class="discovery container" aria-labelledby="inicio-busca-titulo">
+            <div class="discovery-heading"><span class="eyebrow">ENCONTRE SUA PRÓXIMA HISTÓRIA</span><h2 id="inicio-busca-titulo">Qual vai ser a aventura de hoje?</h2></div>
+            <form id="form-inicio" class="inicio-form" role="search">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>
+                <label class="sr-only" for="campo-inicio">Buscar anime, mangá ou manhwa</label>
+                <input id="campo-inicio" name="q" type="search" placeholder="Busque por título, universo ou personagem..." autocomplete="off" spellcheck="false" enterkeyhint="search">
+                <button class="btn" type="submit">Buscar <span aria-hidden="true">→</span></button>
+            </form>
+            <div class="discovery-filters"><span class="filter-caption">Explore por</span><div id="inicio-tipos" class="inicio-chips" role="group" aria-label="Buscar por tipo"></div></div>
+        </section>
+
+        <div class="container catalog-layout">
+            <div class="catalog-main">
+                <section id="animes" class="category-section" aria-labelledby="animes-titulo">
+                    <div class="section-head"><div><p class="eyebrow">ESCOLHAS PARA A SUA MARATONA</p><h2 id="animes-titulo" class="section-title">Animes em destaque<span class="title-dot">.</span></h2></div><a class="text-link" href="leitor.html?tipo=anime">Ver todos <span aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a></div>
+                    <div class="grid home-grid">
+                        <article class="card home-card">
+                            <a class="cover-link" href="leitor.html?busca=Solo%20Leveling&tipo=anime" aria-label="Explorar Solo Leveling"><img src="imagens/solo.jpg" alt="Capa de Solo Leveling" width="681" height="949" loading="lazy" decoding="async"><span class="cover-label">ANIME</span><span class="cover-action" aria-hidden="true">Explorar <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a>
+                            <div class="card-info"><p class="card-genre">AÇÃO <span>·</span> FANTASIA</p><h3><a href="leitor.html?busca=Solo%20Leveling&tipo=anime">Solo Leveling</a></h3><p class="card-description">O despertar de um novo poder.</p></div>
+                        </article>
+                        <article class="card home-card">
+                            <a class="cover-link" href="leitor.html?busca=Jujutsu%20Kaisen&tipo=anime" aria-label="Explorar Jujutsu Kaisen"><img src="imagens/jujutsu.jpg" alt="Capa de Jujutsu Kaisen" width="310" height="420" loading="lazy" decoding="async"><span class="cover-label">ANIME</span><span class="cover-action" aria-hidden="true">Explorar <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a>
+                            <div class="card-info"><p class="card-genre">AÇÃO <span>·</span> SOBRENATURAL</p><h3><a href="leitor.html?busca=Jujutsu%20Kaisen&tipo=anime">Jujutsu Kaisen</a></h3><p class="card-description">Entre maldições e feiticeiros.</p></div>
+                        </article>
+                        <article class="card home-card">
+                            <a class="cover-link" href="leitor.html?busca=One%20Piece&tipo=anime" aria-label="Explorar One Piece"><img src="imagens/onepiece.jpg" alt="Capa de One Piece" width="300" height="599" loading="lazy" decoding="async"><span class="cover-label">ANIME</span><span class="cover-action" aria-hidden="true">Explorar <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a>
+                            <div class="card-info"><p class="card-genre">AVENTURA <span>·</span> FANTASIA</p><h3><a href="leitor.html?busca=One%20Piece&tipo=anime">One Piece</a></h3><p class="card-description">O mundo é só o começo.</p></div>
+                        </article>
+                        <article class="card home-card">
+                            <a class="cover-link" href="leitor.html?busca=Demon%20Slayer&tipo=anime" aria-label="Explorar Demon Slayer"><img src="imagens/demon.jpg" alt="Capa de Demon Slayer" width="800" height="1135" loading="lazy" decoding="async"><span class="cover-label">ANIME</span><span class="cover-action" aria-hidden="true">Explorar <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a>
+                            <div class="card-info"><p class="card-genre">AÇÃO <span>·</span> DEMÔNIOS</p><h3><a href="leitor.html?busca=Demon%20Slayer&tipo=anime">Demon Slayer</a></h3><p class="card-description">Uma promessa além da escuridão.</p></div>
+                        </article>
+                    </div>
+                </section>
+                <section id="manhwas" class="category-section" aria-labelledby="manhwas-titulo">
+                    <div class="section-head"><div><p class="eyebrow">MAIS UM CAPÍTULO. SÓ MAIS UM.</p><h2 id="manhwas-titulo" class="section-title">Mundos para mergulhar<span class="title-dot">.</span></h2></div><a class="text-link" href="leitor.html?tipo=manhwa">Ver manhwas <span aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a></div>
+                    <div class="grid home-grid">
+                        <article class="card home-card">
+                            <a class="cover-link" href="leitor.html?busca=Tower%20of%20God&tipo=manhwa" aria-label="Explorar Tower of God"><img src="imagens/tower.jpg" alt="Capa de Tower of God" width="500" height="688" loading="lazy" decoding="async"><span class="cover-label">MANHWA</span><span class="cover-action" aria-hidden="true">Ler agora <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a>
+                            <div class="card-info"><p class="card-genre">AVENTURA <span>·</span> MISTÉRIO</p><h3><a href="leitor.html?busca=Tower%20of%20God&tipo=manhwa">Tower of God</a></h3><p class="card-description">Até onde vai o seu desejo?</p></div>
+                        </article>
+                        <article class="card home-card">
+                            <a class="cover-link" href="leitor.html?busca=The%20Beginning%20After%20The%20End&tipo=manhwa" aria-label="Explorar The Beginning After The End"><img src="imagens/tbate.jpg" alt="Capa de The Beginning After The End" width="800" height="1280" loading="lazy" decoding="async"><span class="cover-label">MANHWA</span><span class="cover-action" aria-hidden="true">Ler agora <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a>
+                            <div class="card-info"><p class="card-genre">FANTASIA <span>·</span> ISEKAI</p><h3><a href="leitor.html?busca=The%20Beginning%20After%20The%20End&tipo=manhwa">The Beginning After The End</a></h3><p class="card-description">Uma segunda chance de reinar.</p></div>
+                        </article>
+                        <article class="card home-card">
+                            <a class="cover-link" href="leitor.html?busca=Omniscient%20Reader&tipo=manhwa" aria-label="Explorar Omniscient Reader"><img src="imagens/orv.jpg" alt="Capa de Omniscient Reader's Viewpoint" width="800" height="600" loading="lazy" decoding="async"><span class="cover-label">MANHWA</span><span class="cover-action" aria-hidden="true">Ler agora <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a>
+                            <div class="card-info"><p class="card-genre">AÇÃO <span>·</span> APOCALIPSE</p><h3><a href="leitor.html?busca=Omniscient%20Reader&tipo=manhwa">Omniscient Reader</a></h3><p class="card-description">Só um leitor conhece o final.</p></div>
+                        </article>
+                        <article class="card home-card">
+                            <a class="cover-link" href="leitor.html?busca=Wind%20Breaker&tipo=manhwa" aria-label="Explorar Wind Breaker"><img src="imagens/wind.jpg" alt="Capa de Wind Breaker" width="800" height="1210" loading="lazy" decoding="async"><span class="cover-label">MANHWA</span><span class="cover-action" aria-hidden="true">Ler agora <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a>
+                            <div class="card-info"><p class="card-genre">ESPORTE <span>·</span> AMIZADE</p><h3><a href="leitor.html?busca=Wind%20Breaker&tipo=manhwa">Wind Breaker</a></h3><p class="card-description">Liberdade em duas rodas.</p></div>
+                        </article>
+                    </div>
+                </section>
+            </div>
+            <aside class="catalog-sidebar" aria-labelledby="selecao-titulo">
+                <div class="selection-panel"><p class="eyebrow">PORTAL DE ENTRADA</p><h2 id="selecao-titulo">Por onde<br>começar?</h2><p>Algumas histórias merecem um lugar na sua lista.</p>
+                    <ol class="selection-list">
+                        <li><a href="leitor.html?busca=Tensei%20Shitara%20Slime&tipo=anime"><span class="selection-number">01</span><span><strong>Tensei Shitara Slime</strong><small>Um slime. Infinitas possibilidades.</small></span><span aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a></li>
+                        <li><a href="leitor.html?busca=Solo%20Leveling"><span class="selection-number">02</span><span><strong>Solo Leveling</strong><small>Do mais fraco ao mais forte.</small></span><span aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a></li>
+                        <li><a href="leitor.html?busca=Tower%20of%20God"><span class="selection-number">03</span><span><strong>Tower of God</strong><small>O topo é só o começo.</small></span><span aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></a></li>
+                    </ol>
+                </div>
+                <a class="community-panel" href="https://discord.gg/qwb9934Hkh" target="_blank" rel="noopener noreferrer"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5 5 5 2 17l5 2 1-2m9-12 2 0 3 12-5 2-1-2M7 6c3-1 7-1 10 0M7 16c3 2 7 2 10 0"/><circle cx="8.5" cy="11.5" r="1"/><circle cx="15.5" cy="11.5" r="1"/></svg><span class="eyebrow">A AVENTURA CONTINUA</span><h2>Todo universo<br>tem sua comunidade.</h2><p>Troque recomendações e encontre sua próxima obsessão.</p><span class="community-link">Entre no nosso Discord <span aria-hidden="true"><svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span></span><span class="sr-only">(abre em nova aba)</span></a>
+            </aside>
+        </div>
+    </main>
+
+    <footer id="sobre" class="site-footer">
+        <div class="container footer-main"><a class="brand" href="#home"><img src="imagens/dragon-mark.svg" alt="" width="36" height="36"><span class="brand-name">DRAGON<span>TOONS</span><small>UM UNIVERSO INTEIRO PARA EXPLORAR.</small></span></a><div class="footer-links"><a href="leitor.html">Explorar catálogo</a><a href="#animes">Animes</a><a href="#manhwas">Manhwas</a><a href="https://discord.gg/qwb9934Hkh" target="_blank" rel="noopener noreferrer">Discord <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg><span class="sr-only"> (abre em nova aba)</span></a></div></div>
+        <div class="container footer-bottom"><p>© <span id="ano">2026</span> DragonToons. Feito por quem vive boas histórias.</p><p>Uma homenagem de fã ao universo de Tempest.</p></div>
+    </footer>
+    <script src="script.js" defer></script>
+</body>
+</html>

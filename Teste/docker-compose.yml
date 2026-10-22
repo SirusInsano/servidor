@@ -1,0 +1,23 @@
+services:
+  animeworld:
+    build: .
+    image: animeworld:latest
+    container_name: animeworld
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+    ports:
+      # so local: o proxy reverso (Caddy ou Nginx) fica na frente
+      - "127.0.0.1:3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

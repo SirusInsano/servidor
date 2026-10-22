@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="Leitor de animes, mangás e manhwas do DragonToons. Busque obras, veja os capítulos e leia direto no navegador.">
+    <meta name="theme-color" content="#0c1016">
+    <meta name="color-scheme" content="dark">
+    <meta name="robots" content="noindex">
+    <title>Leitor — DragonToons</title>
+    <link rel="icon" href="imagens/dragon-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="reader.css">
+</head>
+<body class="reader-body">
+
+    <a class="skip-link" href="#leitor">Pular para o conteúdo</a>
+
+    <header class="reader-header">
+        <div class="container">
+            <div class="logo">
+                <h1><a href="index.html"><img src="imagens/dragon-mark.svg" alt="" width="32" height="32">Dragon<span>Toons</span></a></h1>
+            </div>
+            <nav aria-label="Navegação principal">
+                <ul>
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="#busca" aria-current="page">Catálogo</a></li>
+                </ul>
+            </nav>
+            <button type="button" id="btn-conta" class="btn-conta" aria-haspopup="dialog">
+                <span id="btn-conta-texto">Entrar</span>
+            </button>
+        </div>
+    </header>
+
+    <main id="leitor" class="container reader-main">
+
+        <!-- ============================ BUSCA ============================ -->
+        <section id="busca" class="reader-view is-active" aria-labelledby="busca-titulo">
+            <div class="reader-intro">
+                <p class="reader-kicker"><span aria-hidden="true"></span> EXPLORE O CATÁLOGO</p>
+                <h2 id="busca-titulo">Sua próxima história<br>começa aqui<span>.</span></h2>
+                <p>Animes, mangás e manhwas. Encontre um novo universo para chamar de seu.</p>
+            </div>
+
+            <form id="form-busca" class="busca-form" role="search">
+                <label class="sr-only" for="campo-busca">Buscar obra pelo nome</label>
+                <input id="campo-busca" name="q" type="search" placeholder="Busque por Solo Leveling, Torre de Deus, Naruto..."
+                       autocomplete="off" spellcheck="false" enterkeyhint="search">
+                <button type="submit" class="btn">Buscar</button>
+            </form>
+
+            <div class="filtros">
+                <span class="filtros-label">Tipo</span>
+                <div id="filtros-tipo" class="chips"></div>
+            </div>
+
+            <div class="filtros filtros-sub" id="linha-subfiltro" hidden>
+                <span class="filtros-label">Hentai</span>
+                <div id="filtros-sub" class="chips"></div>
+            </div>
+
+            <details class="filtros-avancados">
+                <summary>Filtros avançados</summary>
+                <div class="filtros">
+                    <span class="filtros-label">Gênero</span>
+                    <div id="filtros-genero" class="chips"></div>
+                </div>
+            </details>
+
+            <p id="status-busca" class="reader-status" role="status"></p>
+            <div id="resultados" class="grid reader-grid"></div>
+
+            <section id="historico" class="historico" hidden aria-labelledby="historico-titulo">
+                <h2 id="historico-titulo" class="section-title">Continuar de onde parei</h2>
+                <p id="historico-status" class="reader-status"></p>
+                <div id="historico-lista" class="historico-lista"></div>
+            </section>
+        </section>
+
+        <!-- ============================ OBRA ============================ -->
+        <section id="obra" class="reader-view" aria-labelledby="obra-nome" hidden>
+            <button type="button" class="btn-voltar" data-voltar="busca">&larr; Voltar para a busca</button>
+
+            <header class="obra-cabecalho">
+                <img id="obra-capa" class="obra-capa" alt="" width="220" height="330" decoding="async">
+                <div class="obra-info">
+                    <h2 id="obra-nome"></h2>
+                    <p id="obra-meta" class="obra-meta"></p>
+                    <p id="obra-descricao" class="obra-descricao"></p>
+                    <div id="obra-tags" class="obra-tags"></div>
+                </div>
+            </header>
+
+            <h3 class="section-title">Capítulos</h3>
+            <p id="status-obra" class="reader-status" role="status"></p>
+            <div id="capitulos" class="capitulos"></div>
+
+            <section id="comentarios" class="comentarios" aria-labelledby="comentarios-titulo">
+                <h3 id="comentarios-titulo" class="section-title">Comentários</h3>
+                <p id="comentarios-status" class="reader-status"></p>
+
+                <form id="form-comentario" class="form-comentario" hidden>
+                    <label class="sr-only" for="campo-comentario">Seu comentário</label>
+                    <textarea id="campo-comentario" rows="3" maxlength="2000" placeholder="O que você achou deste capítulo?"></textarea>
+                    <div class="form-comentario-acoes">
+                        <span id="comentario-dica" class="reader-status"></span>
+                        <button type="submit" class="btn">Comentar</button>
+                    </div>
+                </form>
+
+                <div id="comentarios-lista" class="comentarios-lista"></div>
+            </section>
+        </section>
+
+        <!-- ============================ CAPÍTULO ============================ -->
+        <section id="capitulo" class="reader-view reader-view-leitor" aria-labelledby="capitulo-titulo" hidden>
+            <div class="leitor-topo">
+                <button type="button" class="btn-voltar" data-voltar="obra">&larr; Voltar para a obra</button>
+                <div class="leitor-acoes">
+                    <button type="button" id="btn-modo" class="btn-secundario" aria-pressed="false">Ajustar à tela</button>
+                    <a id="link-fonte" class="btn-secundario" href="#" target="_blank" rel="noopener noreferrer">Ver na fonte</a>
+                </div>
+            </div>
+
+            <h2 id="capitulo-titulo" class="leitor-titulo"></h2>
+            <p id="capitulo-progresso" class="reader-status" role="status"></p>
+
+            <div id="player-anime" class="player-anime" hidden></div>
+            <div id="paginas" class="paginas"></div>
+
+            <nav class="leitor-navegacao" aria-label="Navegação entre capítulos">
+                <button type="button" id="btn-anterior" class="btn-secundario">&larr; Anterior</button>
+                <button type="button" id="btn-proximo" class="btn">Próximo &rarr;</button>
+            </nav>
+        </section>
+
+    </main>
+
+    <footer class="reader-footer">
+        <div class="container">
+            <p>Conteúdo servido pela fonte original. O DragonToons não hospeda nem espelha capítulos.</p>
+            <a href="index.html">Voltar ao site</a>
+        </div>
+    </footer>
+
+    <dialog id="dlg-conta" class="dlg dlg-conta" aria-labelledby="dlg-conta-titulo">
+        <form method="dialog" class="dialog-close">
+            <button type="submit" aria-label="Fechar janela da conta">&times;</button>
+        </form>
+        <p class="reader-kicker">SEU UNIVERSO, NO SEU RITMO</p>
+        <h3 id="dlg-conta-titulo">Sua conta</h3>
+
+        <div id="painel-conta">
+            <form id="form-login" class="form-conta">
+                <label for="login-identificador">Usuário ou email</label>
+                <input id="login-identificador" type="text" autocomplete="username" required>
+
+                <label for="login-senha">Senha</label>
+                <input id="login-senha" type="password" autocomplete="current-password" required>
+
+                <p id="login-erro" class="form-erro" role="alert"></p>
+                <div class="form-conta-acoes">
+                    <button type="submit" class="btn">Entrar</button>
+                    <button type="button" id="btn-ir-cadastro" class="btn-secundario">Criar conta</button>
+                </div>
+            </form>
+
+            <form id="form-cadastro" class="form-conta" hidden>
+                <label for="cad-usuario">Usuário</label>
+                <input id="cad-usuario" type="text" autocomplete="username" minlength="3" maxlength="32" required>
+
+                <label for="cad-email">Email</label>
+                <input id="cad-email" type="email" autocomplete="email" required>
+
+                <label for="cad-senha">Senha</label>
+                <input id="cad-senha" type="password" autocomplete="new-password" minlength="6" required>
+
+                <p id="cad-erro" class="form-erro" role="alert"></p>
+                <div class="form-conta-acoes">
+                    <button type="submit" class="btn">Criar conta</button>
+                    <button type="button" id="btn-ir-login" class="btn-secundario">Já tenho conta</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="painel-perfil" hidden>
+            <p class="perfil-info">Conectado como <strong id="perfil-usuario"></strong></p>
+            <div class="form-conta-acoes">
+                <button type="button" id="btn-logout" class="btn-secundario">Sair da conta</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="dlg-adulto" class="dlg" aria-labelledby="dlg-adulto-titulo">
+        <h3 id="dlg-adulto-titulo">Conteúdo adulto (18+)</h3>
+        <p>O filtro <strong>Hentai</strong> mostra obras com conteúdo adulto. Ele fica
+           desligado por padrão e a confirmação só é pedida uma vez neste navegador.</p>
+        <div class="dlg-acoes">
+            <button type="button" id="dlg-ok" class="btn">Tenho 18 anos ou mais</button>
+            <button type="button" id="dlg-cancelar" class="btn-secundario">Cancelar</button>
+        </div>
+    </dialog>
+
+    <script src="reader.js" defer></script>
+
+</body>
+</html>

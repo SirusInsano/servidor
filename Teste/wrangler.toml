@@ -1,0 +1,21 @@
+name = "dragontoons"
+main = "worker.js"
+compatibility_date = "2026-10-22"
+# nodejs_compat habilita node:crypto, necessario para decifrar o desafio AES
+# das fontes (o WebCrypto nao aceita AES-CBC sem padding PKCS#7 valido).
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+# O site estatico e a API no mesmo projeto/dominio:
+# /api/* passa pelo Worker, o resto vai direto dos assets.
+[assets]
+directory = "."
+binding = "ASSETS"
+not_found_handling = "none"
+run_worker_first = ["/api/*"]
+
+# Banco das contas, comentarios e historico
+[[d1_databases]]
+binding = "ANIMEWORLD_DB"
+database_name = "dragontoons"
+database_id = "3656760a-6e98-41df-a028-ea78bf14b340"

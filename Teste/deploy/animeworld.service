@@ -1,0 +1,40 @@
+# Alternativa sem Docker: roda o Node direto como servico do systemd.
+#
+# Uso:
+#   sudo cp deploy/animeworld.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now animeworld
+
+[Unit]
+Description=AnimeWorld - site e API de anime
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=animeworld
+Group=animeworld
+WorkingDirectory=/opt/animeworld
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOST=127.0.0.1
+ExecStart=/usr/bin/node /opt/animeworld/server.js
+Restart=always
+RestartSec=5
+
+# endure limits
+LimitNOFILE=65535
+
+# hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/animeworld
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=animeworld
+
+[Install]
+WantedBy=multi-user.target

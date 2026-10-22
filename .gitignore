@@ -1,0 +1,12 @@
+# Dependências e estado local do projeto extraído
+Teste/node_modules/
+Teste/.dados/
+Teste/.wrangler/
+Teste/.claude/
+Teste/.env
+Teste/.env.*
+!Teste/.env.example
+Teste/*.log
+# Resultados de execução e testes
+Teste/test-results/
+Teste/playwright-report/

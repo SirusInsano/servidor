@@ -1,0 +1,35 @@
+# Caddy: proxy reverso com HTTPS automatico (certificado Let's Encrypt via ACME).
+#
+# Uso:
+#   1. copie este arquivo para /etc/caddy/Caddyfile
+#   2. troque SEUDOMINIO.com pelo seu dominio
+#   3. caddy reload
+#
+# O Caddy precisa do dominio apontando para o IP do servidor (registro A)
+# antes de emitir o certificado.
+
+SEUDOMINIO.com {
+	encode zstd gzip
+
+	# rate limit simples na API (o site estatico nao e limitado)
+	@api path /api/*
+	handle @api {
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	# resto: arquivos estaticos servidos pelo proprio Node
+	handle {
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	log {
+		output file /var/log/caddy/animeworld.log
+	}
+}
