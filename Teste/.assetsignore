@@ -17,6 +17,7 @@ schema.sql
 db.js
 auth.js
 lycan.js
+loobyt.js
 *.md
 !README.md
 *.tmp
