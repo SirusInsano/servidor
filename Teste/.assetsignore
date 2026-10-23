@@ -21,3 +21,5 @@ loobyt.js
 *.md
 !README.md
 *.tmp
+
+mangadash.js

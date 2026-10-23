@@ -12,6 +12,13 @@
     var SITE = 'https://vegitoons.black';
     // Backend local de anime (server.js). Vazio = mesma origem.
     var API_ANIME = (window.ANIME_API || '') + '/api/anime';
+    var WIND_MANGADASH = {
+        obr_id: 'mangadash:135-wind-breaker', obr_nome: 'Wind Breaker',
+        obr_imagem: '/imagens/wind-mangadash.svg',
+        obr_descricao: 'Haruka Sakura chega à Fuurin em busca dos mais fortes.',
+        genero: { gen_id: 1, gen_nome: 'Ação' }, formato: { formt_id: 3 },
+        mangadash: true, slug: '135-wind-breaker'
+    };
     var TIMEOUT = 20000;
     var CHAVE_PROGRESSO = 'dragontoons:progresso';
 
@@ -627,6 +634,9 @@
             return finalizar(todas);
 
             function finalizar(brutas) {
+                if ((pagina || 1) === 1 && (!termo || /wind|breaker/i.test(termo)) && (!estado.tag || estado.tag === 1)) {
+                    brutas.unshift(WIND_MANGADASH);
+                }
                 var obras = brutas.filter(aceito);
                 renderObras(obras, termo, acumular);
                 estado.paginaAtual = pagina || 1;
@@ -771,6 +781,8 @@
     /* ======================= Obra ======================= */
 
     function abrirObra(obra) {
+        if (obra === WIND_MANGADASH.obr_id) obra = WIND_MANGADASH;
+        if (obra && obra.mangadash) return abrirObraLoobyt(obra);
         if (obra && obra.anime) return abrirObraAnime(obra);
         if (obra && obra.loobyt) return abrirObraLoobyt(obra);
         var obraId = obra.obr_id;
@@ -835,7 +847,7 @@
         $('#status-obra').textContent = 'Carregando…';
         $('#capitulos').innerHTML = '';
 
-        return fetch('/api/loobyt/capitulos?slug=' + encodeURIComponent(obra.slug), { credentials: 'same-origin' })
+        return fetch('/api/' + (obra.mangadash ? 'mangadash' : 'loobyt') + '/capitulos?slug=' + encodeURIComponent(obra.slug), { credentials: 'same-origin' })
             .then(function (r) { return r.json(); })
             .then(function (d) {
                 estado.obra = obra;
@@ -845,7 +857,9 @@
                         cap_nome: c.titulo || ('Capítulo ' + c.numero),
                         cap_numero: c.numero,
                         cap_paginas: c.paginas,
-                        loobyt: true
+                        loobyt: !obra.mangadash,
+                        mangadash: !!obra.mangadash,
+                        url: c.url
                     };
                 });
 
@@ -869,7 +883,7 @@
                     titulo: obra.obr_nome,
                     capa: obra.obr_imagem || null,
                     slug: obra.slug,
-                    fonte: 'loobyt',
+                    fonte: obra.mangadash ? 'mangadash' : 'loobyt',
                     status: 'lendo'
                 });
                 historico('/leitor.html?obra=' + encodeURIComponent(obra.obr_id));
@@ -967,7 +981,12 @@
     }
 
     function abrirCapitulo(cap) {
+        if (typeof cap === 'string' || typeof cap === 'number') {
+            cap = estado.capitulos.find(function (c) { return String(c.cap_id) === String(cap); });
+        }
+        if (!cap) return Promise.resolve();
         if (cap && cap.cap_url) return abrirCapituloAnime(cap);
+        if (cap && cap.mangadash) return abrirCapituloMangaDash(cap);
         if (cap && cap.loobyt) return abrirCapituloLoobyt(cap);
         var capituloId = cap.cap_id;
         var progresso = $('#capitulo-progresso');
@@ -1043,6 +1062,63 @@
                 console.error('[leitor] falha ao carregar páginas do loobyt:', erro);
                 progresso.textContent = 'Não foi possível carregar as páginas agora.';
             });
+    }
+
+    var pdfAtivo = null;
+    var pdfObserver = null;
+    var pdfGeracao = 0;
+    async function abrirCapituloMangaDash(cap) {
+        var geracao = ++pdfGeracao;
+        if (pdfObserver) pdfObserver.disconnect();
+        if (pdfAtivo) { pdfAtivo.destroy(); pdfAtivo = null; }
+        estado.capitulo = cap;
+        estado.indiceCapitulo = estado.capitulos.findIndex(function (c) { return c.cap_id === cap.cap_id; });
+        $('#player-anime').hidden = true;
+        var container = $('#paginas');
+        container.hidden = false;
+        container.innerHTML = '';
+        $('#capitulo-titulo').textContent = 'Wind Breaker — ' + cap.cap_nome;
+        $('#link-fonte').href = cap.url;
+        var progresso = $('#capitulo-progresso');
+        progresso.textContent = 'Carregando páginas…';
+        mostrar('capitulo');
+        atualizarBotoes();
+        historico('/leitor.html?obra=' + encodeURIComponent(WIND_MANGADASH.obr_id) + '&cap=' + encodeURIComponent(cap.cap_id));
+        try {
+            var pdfjs = await import('/vendor/pdfjs/pdf.min.mjs');
+            if (geracao !== pdfGeracao) return;
+            pdfjs.GlobalWorkerOptions.workerSrc = '/vendor/pdfjs/pdf.worker.min.mjs';
+            pdfAtivo = pdfjs.getDocument({ url: '/api/mangadash/pdf?cap=' + encodeURIComponent(cap.cap_id), isEvalSupported: false });
+            var pdf = await pdfAtivo.promise;
+            if (geracao !== pdfGeracao) return;
+            progresso.textContent = pdf.numPages + ' páginas';
+            var queue = Promise.resolve();
+            pdfObserver = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) return;
+                    pdfObserver.unobserve(entry.target);
+                    queue = queue.then(async function () {
+                        if (geracao !== pdfGeracao) return;
+                        var canvas = entry.target;
+                        var page = await pdf.getPage(Number(canvas.dataset.page));
+                        if (geracao !== pdfGeracao) return;
+                        var base = page.getViewport({ scale: 1 });
+                        var viewport = page.getViewport({ scale: Math.min(1200, container.clientWidth * (devicePixelRatio || 1)) / base.width });
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+                        await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+                        page.cleanup();
+                    }).catch(function () { if (geracao === pdfGeracao) progresso.textContent = 'Falha ao carregar uma página. Tente novamente ou abra a fonte.'; });
+                });
+            }, { rootMargin: '800px' });
+            for (var i = 1; i <= pdf.numPages; i++) {
+                var canvas = el('canvas', { class: 'pagina pagina-pdf', 'data-page': i, 'aria-label': 'Página ' + i, role: 'img', width: 800, height: 1200 });
+                container.appendChild(canvas);
+                pdfObserver.observe(canvas);
+            }
+        } catch (error) {
+            if (geracao === pdfGeracao) progresso.textContent = 'Não foi possível carregar o capítulo. Tente novamente ou abra a fonte.';
+        }
     }
 
     // Capitulo de anime: busca o player na fonte e mostra em iframe

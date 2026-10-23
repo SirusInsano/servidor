@@ -11,6 +11,7 @@
 import { createDecipheriv } from 'node:crypto';
 import auth from './auth';
 import loobyt from './loobyt';
+import mangadash from './mangadash';
 
 const FONTES = [
     {
@@ -551,6 +552,8 @@ async function tratar(request, env) {
             const resposta = await auth.tratar(request, env, url);
             if (resposta) return comSeguranca(resposta);
         }
+
+        if (p.startsWith('/api/mangadash/')) return comSeguranca(await mangadash.tratar(url));
 
         // ---------- Loobyt (ex-NoxManga), via API assinada ----------
         if (p === '/api/loobyt/busca') {

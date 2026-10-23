@@ -296,3 +296,5 @@
 @media (prefers-reduced-motion: reduce) {
     .reader-body *, .reader-body *::before, .reader-body *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+.pagina-pdf { display: block; width: 100%; height: auto; background: white; margin: 0 auto 8px; }

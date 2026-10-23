@@ -28,6 +28,7 @@ try {
 
 // Cliente do Loobyt (ex-NoxManga) - API assinada
 const loobyt = require('./loobyt');
+const mangadash = require('./mangadash');
 
 // Contas, comentarios e historico
 const auth = require('./auth');
@@ -42,6 +43,7 @@ const MIME = {
     '.html': 'text/html; charset=utf-8',
     '.css': 'text/css; charset=utf-8',
     '.js': 'application/javascript; charset=utf-8',
+    '.mjs': 'application/javascript; charset=utf-8',
     '.json': 'application/json; charset=utf-8',
     '.jpg': 'image/jpeg',
     '.jpeg': 'image/jpeg',
@@ -651,6 +653,8 @@ const servidor = http.createServer(async (req, res) => {
             const resposta = await auth.tratar(req, {}, u);
             if (resposta) return responderWeb(res, resposta);
         }
+
+        if (p.startsWith('/api/mangadash/')) return responderWeb(res, await mangadash.tratar(u));
 
         // ---------- Loobyt (ex-NoxManga), via API assinada ----------
         if (p === '/api/loobyt/busca') {
