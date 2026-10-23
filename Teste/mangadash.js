@@ -34,7 +34,7 @@ async function tratar(url) {
             const cap = url.searchParams.get('cap') || '';
             if (!/^\d+(?:\.\d+)?$/.test(cap)) return reply({ erro: 'Capítulo inválido' }, 400);
             const target = pdfUrl(await html('/capitulo/' + SLUG + '/' + cap));
-            const response = await fetch(target, { signal: AbortSignal.timeout(30000), redirect: 'error' });
+            const response = await fetch(target, { signal: AbortSignal.timeout(30000), redirect: 'manual' });
             if (!response.ok) throw new Error('PDF indisponível');
             return new Response(response.body, { headers: { 'Content-Type': 'application/pdf', 'Cache-Control': 'public, max-age=3600', 'X-Content-Type-Options': 'nosniff' } });
         }
