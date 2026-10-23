@@ -15,26 +15,11 @@ import mangadash from './mangadash';
 
 const FONTES = [
     {
-        id: 'animesonlinecc',
-        nome: 'Animes Online',
-        base: 'https://animesonlinecc.to',
-        // Obras escolhidas para a home, mesmo fora da primeira página da fonte.
-        destaques: [{
-            slug: 'tensei-shitara-slime-datta-ken',
-            titulo: 'Tensei Shitara Slime Datta Ken',
-            capa: '/imagens/slime.jpg'
-        }],
-        listagem: '/anime/',
-        pagina: '/anime/',
-        reAnime: /\/anime\/([a-z0-9\-]+)\/?$/i,
-        reEpisodio: /\/episodio\/([a-z0-9\-]+)-episodio-(\d+)\/?$/i
-    },
-    {
         id: 'animesdigital',
         nome: 'Animes Digital',
         base: 'https://animesdigital.org',
         pesquisa: (termo) => '/pesquisa/' + encodeURIComponent(termo) + '/',
-        destaques: [{
+        destaques: [{ slug: 'tensei-shitara-slime-datta-ken', titulo: 'Tensei Shitara Slime Datta Ken', capa: '/imagens/slime.jpg' }, {
             slug: 'tensei-shitara-slime-datta-ken-dublado',
             titulo: 'Tensei Shitara Slime Datta Ken Dublado',
             capa: '/imagens/slime.jpg'
@@ -43,35 +28,6 @@ const FONTES = [
         pagina: '/anime/a/',
         reAnime: /\/anime\/a\/([a-z0-9\-]+)\/?$/i,
         reEpisodio: /\/episodio\/([a-z0-9\-]+)-episodio-(\d+)\/?$/i
-    },
-    {
-        id: 'meusanimes',
-        nome: 'Meus Animes',
-        base: 'https://meusanimes.blog',
-        listagem: '/a/',
-        pagina: '/a/',
-        reAnime: /\/a\/([a-z0-9\-]+)\/?$/i,
-        reEpisodio: /\/episodio\/([a-z0-9\-]+)-episodio-(\d+)\/?$/i
-    },
-    {
-        id: 'assistiranimesonline',
-        nome: 'Assistir Animes Online',
-        base: 'https://assistiranimesonline.net',
-        listagem: '/animes/',
-        pagina: '/anime/',
-        reAnime: /\/anime\/([a-z0-9\-]+)\/?$/i,
-        reEpisodio: /\/episodio\/([a-z0-9\-]+)-episodio-(\d+)\/?$/i
-    },
-    {
-        id: 'hydraani',
-        nome: 'Hydra Ani',
-        base: 'https://hydraani.free.nf',
-        listagem: '/',
-        pagina: (slug) => '/?slug=' + encodeURIComponent(slug),
-        reAnime: /[?&]slug=([a-z0-9\-]+)/i,
-        rePlayer: /<iframe[^>]+src=["']([^"']+)["']/i,
-        // fonte de conteudo adulto: so entra em "Hentai Anime"
-        adulto: true
     }
 ];
 
@@ -86,17 +42,7 @@ const TTL_MEMORIA = 5 * 60 * 1000;
    ========================================================= */
 
 /** Hosts que o Worker tem permissao de buscar. */
-const HOSTS_PERMITIDOS = new Set([
-    'animesonlinecc.to',
-    'animesdigital.org',
-    'meusanimes.blog',
-    'assistiranimesonline.net',
-    'hydraani.free.nf',
-    'blogger.com',
-    'blogger.googleusercontent.com',
-    'dri.me',
-    'hydra-player-worker.gamesdonghuax.workers.dev'
-]);
+const HOSTS_PERMITIDOS = new Set(['animesdigital.org']);
 
 /** Redes privadas/link-local que nunca devem ser alcancadas. */
 function hostPrivado(host) {
@@ -393,7 +339,7 @@ const CACHE_TTL_PLAYER = 600;
  * Versao do cache. incremente sempre que mudar o parser ou as fontes:
  * a edge guarda a resposta antiga por 10 min e nao invalida no deploy.
  */
-const VERSAO_CACHE = 'v4-slime';
+const VERSAO_CACHE = 'v5-digital-only';
 
 /** Chave de cache versionada (independe da query da URL). */
 function requisicaoCache(request) {

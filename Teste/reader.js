@@ -89,7 +89,6 @@
 
     // Subtipos que aparecem ao escolher "Hentai 18+"
     var SUBFILTROS = [
-        { id: 'anime', nome: 'Hentai Anime' },
         { id: 'manhwa', nome: 'Hentai Manhwa' },
         { id: 'manga', nome: 'Hentai Manga' }
     ];
@@ -472,7 +471,7 @@
 
         var params = new URLSearchParams();
         if (termo) params.set('q', termo);
-        if (fonteParam) params.set('fonte', fonteParam);
+        params.set('fonte', 'animesdigital');
         var qs = params.toString();
 
         return apiAnime('/busca' + (qs ? '?' + qs : '')).then(function (dados) {
@@ -532,7 +531,7 @@
         if (sel.tipo === 'genero') {
             // Hentai: o subtipo decide a origem
             if (estado.subfiltro === 'anime') {
-                return buscarAnime(termo, acumular, 'hydraani');
+                estado.subfiltro = 'manhwa';
             }
             if (estado.subfiltro === 'manga') {
                 // Hentai publicado como one-shot: genre 18 + tag "Adulto" (29)
@@ -897,6 +896,12 @@
     function renderCapitulos() {
         var container = $('#capitulos');
         container.innerHTML = '';
+        var anime = !!(estado.obra && estado.obra.anime);
+        container.classList.toggle('episode-grid', anime);
+        $('#obra').classList.toggle('anime-detail', anime);
+        $('#lista-titulo').textContent = anime ? 'Todos os episódios' : 'Capítulos';
+        $('#episode-controls').hidden = !anime;
+        if (anime) return renderEpisodios();
 
         if (!estado.capitulos.length) {
             $('#status-obra').textContent = 'Nenhum capítulo disponível.';
@@ -928,6 +933,30 @@
         $('#status-obra').textContent = msg;
     }
 
+    function renderEpisodios() {
+        var container = $('#capitulos');
+        container.innerHTML = '';
+        var termo = $('#episode-search').value.trim().toLowerCase();
+        var lista = estado.capitulos.filter(function (c) {
+            return !termo || String(c.cap_numero) === termo || (c.cap_nome || '').toLowerCase().includes(termo);
+        }).slice();
+        if ($('#episode-order').value === 'desc') lista.reverse();
+        var obra = estado.obra.anime;
+        lista.forEach(function (cap) {
+            var visual = el('span', { class: 'episode-cover' }, [
+                el('span', { class: 'episode-play', text: '▶', 'aria-hidden': 'true' }),
+                el('span', { class: 'episode-number', text: 'EP ' + cap.cap_numero })
+            ]);
+            if (obra.capa) visual.prepend(el('img', { src: obra.capa, alt: '', loading: 'lazy', decoding: 'async' }));
+            container.appendChild(el('button', { type: 'button', class: 'episode-card', onclick: function () { abrirCapitulo(cap); } }, [
+                visual, el('span', { class: 'episode-title', text: cap.cap_nome || 'Episódio ' + cap.cap_numero }),
+                el('span', { class: 'episode-series', text: obra.titulo }),
+                el('span', { class: 'episode-watch', text: 'Assistir episódio →' })
+            ]));
+        });
+        $('#status-obra').textContent = lista.length ? lista.length + ' episódios · Animes Digital' : 'Nenhum episódio encontrado.';
+    }
+
     /* ======================= Capítulo ======================= */
 
     var observador = null;
@@ -935,6 +964,8 @@
     // Obra de anime: episodios vem do backend local
     function abrirObraAnime(obra) {
         var a = obra.anime;
+        $('#episode-search').value = '';
+        $('#episode-order').value = 'asc';
         estado.obra = obra;
         estado.modo = 'anime';
 
@@ -1167,6 +1198,7 @@
                 progresso.textContent = 'Player indisponivel. Use "Ver na fonte".';
             }
             mostrar('capitulo');
+            atualizarBotoes();
             historico('/leitor.html?anime=' + encodeURIComponent(obra.anime ? obra.anime.id : '') +
                 '&cap=' + encodeURIComponent(cap.cap_id));
         });
@@ -1252,6 +1284,8 @@
     /* ======================= Eventos ======================= */
 
     function iniciar() {
+        $('#episode-search').addEventListener('input', renderEpisodios);
+        $('#episode-order').addEventListener('change', renderEpisodios);
         // Genero (filtros avancados): selecao unica, clique de novo desmarca
         montarChips($('#filtros-genero'), GENEROS, function (item) {
             estado.tag = estado.tag === item.id ? null : item.id;
@@ -1422,7 +1456,7 @@
             botao.addEventListener('click', function () {
                 var destino = botao.dataset.voltar;
                 mostrar(destino);
-                historico(destino === 'busca' ? '/leitor.html' : '/leitor.html?obra=' + encodeURIComponent(estado.obra.obr_id));
+                historico(destino === 'busca' ? '/leitor.html' : '/leitor.html?' + (estado.obra.anime ? 'anime=' : 'obra=') + encodeURIComponent(estado.obra.obr_id));
             });
         });
 
@@ -1443,6 +1477,21 @@
         var obra = params.get('obra');
         var cap = params.get('cap');
         var slugTipo = params.get('tipo');
+
+        var animeId = params.get('anime');
+        if (animeId) {
+            var slug = animeId.split(':').slice(1).join(':');
+            if (!/^animesdigital:[a-z0-9-]+$/.test(animeId)) {
+                status('Esta fonte foi removida. Busque o anime no Animes Digital.');
+                mostrar('busca');
+                return;
+            }
+            var titulo = slug.replace(/-/g, ' ');
+            return apiAnime('/busca?q=' + encodeURIComponent(titulo) + '&fonte=animesdigital').then(function (d) {
+                var anime = d.obras.find(function (a) { return a.id === animeId; }) || { id: animeId, fonte: 'animesdigital', fonteNome: 'Animes Digital', slug: slug, titulo: titulo };
+                return abrirObraAnime({ obr_id: anime.id, anime: anime });
+            }).then(function () { if (cap) return abrirCapitulo(cap); }).catch(function () { status('Não foi possível abrir este anime agora.'); });
+        }
 
         if (cap) {
             abrirObra(obra).then(function () {
