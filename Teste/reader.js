@@ -931,7 +931,7 @@
             .then(function (dados) {
                 estado.capitulos = ((dados && dados.episodios) || []).map(function (e) {
                     return {
-                        cap_id: a.fonte + ':' + a.slug + ':' + e.numero,
+                        cap_id: a.fonte + ':' + (e.url || (a.slug + ':' + e.numero)),
                         cap_nome: e.titulo,
                         cap_numero: e.numero,
                         cap_url: e.url,

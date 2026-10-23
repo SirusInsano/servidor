@@ -61,6 +61,12 @@ const FONTES = [
         id: 'animesonlinecc',
         nome: 'Animes Online',
         base: 'https://animesonlinecc.to',
+        // Obras escolhidas para a home, mesmo fora da primeira página da fonte.
+        destaques: [{
+            slug: 'tensei-shitara-slime-datta-ken',
+            titulo: 'Tensei Shitara Slime Datta Ken',
+            capa: '/imagens/slime.jpg'
+        }],
         listagem: '/anime/',
         pagina: '/anime/',
         reAnime: /\/anime\/([a-z0-9\-]+)\/?$/i,
@@ -70,6 +76,12 @@ const FONTES = [
         id: 'animesdigital',
         nome: 'Animes Digital',
         base: 'https://animesdigital.org',
+        pesquisa: (termo) => '/pesquisa/' + encodeURIComponent(termo) + '/',
+        destaques: [{
+            slug: 'tensei-shitara-slime-datta-ken-dublado',
+            titulo: 'Tensei Shitara Slime Datta Ken Dublado',
+            capa: '/imagens/slime.jpg'
+        }],
         listagem: '/',
         pagina: '/anime/a/',
         reAnime: /\/anime\/a\/([a-z0-9\-]+)\/?$/i,
@@ -282,30 +294,56 @@ function resolver(fonte, href) {
 }
 
 /** Extrai a lista de episodios (ou o player) de uma pagina de anime. */
-function extrairEpisodios(html, fonte) {
+function extrairEpisodios(html, fonte, slug) {
+    if (fonte.id === 'animesdigital') {
+        const episodios = new Map();
+        const links = /<a\b[^>]*href=["']([^"']*\/video\/a\/\d+\/?)["'][^>]*>([\s\S]*?)<\/a>/gi;
+        for (const link of html.matchAll(links)) {
+            const numero = link[2].match(/Epis[oó]dio\s*(\d+)/i);
+            if (!numero) continue;
+            const url = resolver(fonte, link[1]);
+            episodios.set(url, { numero: Number(numero[1]), titulo: 'Episódio ' + Number(numero[1]), url });
+        }
+        if (episodios.size) return [...episodios.values()].sort((a, b) => a.numero - b.numero);
+    }
     if (fonte.rePlayer) {
         const m = html.match(fonte.rePlayer);
         if (!m) return [];
         const player = resolver(fonte, m[1]);
         return [{ numero: 1, titulo: 'Assistir', url: player, player: player }];
     }
+
     const reHref = /href=["']([^"']+)["']/gi;
     const mapa = new Map();
     let m;
     while ((m = reHref.exec(html)) !== null) {
-        const href = m[1];
-        const achado = href.match(fonte.reEpisodio);
+        const achado = m[1].match(fonte.reEpisodio);
         if (!achado) continue;
+        // Não confundir recomendações da página com episódios desta obra.
+        if (fonte.id === 'animesonlinecc' && slug &&
+            achado[1] !== slug && !achado[1].startsWith(slug + '-')) continue;
         const num = Number(achado[2]);
-        if (!mapa.has(num)) {
-            mapa.set(num, {
+        const sufixo = slug && achado[1].startsWith(slug + '-')
+            ? achado[1].slice(slug.length + 1) : '';
+        const temporada = /^\d+$/.test(sufixo) ? Number(sufixo) : 1;
+        const url = resolver(fonte, m[1]);
+        // Cada temporada pode ter um episódio 1: a URL identifica o episódio.
+        if (!mapa.has(url)) {
+            mapa.set(url, {
                 numero: num,
+                temporada,
                 titulo: 'Episódio ' + num,
-                url: resolver(fonte, href)
+                url
             });
         }
     }
-    return Array.from(mapa.values()).sort((a, b) => a.numero - b.numero);
+    const episodios = Array.from(mapa.values());
+    if (episodios.some((ep) => ep.temporada > 1)) {
+        episodios.forEach((ep) => {
+            ep.titulo = 'Temporada ' + ep.temporada + ' · Episódio ' + ep.numero;
+        });
+    }
+    return episodios.sort((a, b) => a.temporada - b.temporada || a.numero - b.numero);
 }
 
 /* =========================================================
@@ -413,13 +451,15 @@ function aplicarSeguranca(res) {
 
 const estadoFonte = {};
 
-async function listarFonte(fonte) {
-    const chave = 'lista:' + fonte.id;
+async function listarFonte(fonte, termo = '') {
+    const pesquisa = fonte.pesquisa && termo.trim();
+    const caminho = pesquisa ? fonte.pesquisa(termo.trim()) : fonte.listagem;
+    const chave = 'lista:' + fonte.id + ':' + caminho;
     const guardado = doCache(chave, 10 * 60 * 1000);
     if (guardado) return guardado;
 
     try {
-        const r = await buscarExterno(fonte.base + fonte.listagem);
+        const r = await buscarExterno(fonte.base + caminho);
         if (r.status !== 200) throw new Error('HTTP ' + r.status);
         const lista = extrairAnimes(r.body, fonte);
         estadoFonte[fonte.id] = { ok: true, quando: Date.now(), total: lista.length, erro: null };
@@ -438,7 +478,7 @@ async function episodiosDe(fonte, slug) {
     const caminho = typeof fonte.pagina === 'function' ? fonte.pagina(slug) : fonte.pagina + slug + '/';
     const r = await buscarExterno(fonte.base + caminho);
     if (r.status !== 200) throw new Error('HTTP ' + r.status);
-    const eps = extrairEpisodios(r.body, fonte);
+    const eps = extrairEpisodios(r.body, fonte, slug);
     return noCache(chave, eps, 30 * 60 * 1000);
 }
 
@@ -453,8 +493,15 @@ async function apiBusca(termo, somenteFonte) {
         ? FONTES.filter((f) => f.id === somenteFonte)
         : FONTES.filter((f) => !f.adulto);
 
-    const resultados = await Promise.all(ativas.map((f) => listarFonte(f)));
-    let todas = [].concat.apply([], resultados);
+    const resultados = await Promise.all(ativas.map((f) => listarFonte(f, termo)));
+    const destaques = ativas.flatMap((f) => (f.destaques || []).map((a) => ({
+        ...a,
+        id: f.id + ':' + a.slug,
+        fonte: f.id,
+        fonteNome: f.nome,
+        url: resolver(f, f.pagina + a.slug + '/')
+    })));
+    let todas = destaques.concat(...resultados);
 
     if (somenteFonte) {
         todas = todas.filter((a) => a.fonte === somenteFonte);
