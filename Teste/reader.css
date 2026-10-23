@@ -317,3 +317,8 @@
 .episode-watch { margin-top: auto; padding: 14px; color: var(--accent-color); font-size: .75rem; }
 @media(max-width: 900px) { .episode-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .episode-heading { align-items: stretch; flex-direction: column; } }
 @media(max-width: 600px) { .episode-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } #episode-controls:not([hidden]) { flex-direction: column; } .anime-detail .obra-cabecalho { padding: 18px; } }
+
+#resultados.episode-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#resultados .episode-card { text-decoration: none; }
+@media (max-width: 900px) { #resultados.episode-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 600px) { #resultados.episode-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

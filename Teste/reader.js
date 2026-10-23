@@ -467,7 +467,11 @@
 
     // Busca de anime: consulta o backend local (server.js)
     function buscarAnime(termo, acumular, fonteParam) {
-        status(termo ? 'Buscando animes…' : 'Carregando animes…');
+        if (!termo || !termo.trim()) return buscarLancamentos(acumular);
+        $('#anime-feed-title').hidden = true;
+        var more = $('#btn-mais');
+        if (more) more.remove();
+        status('Buscando animes…');
 
         var params = new URLSearchParams();
         if (termo) params.set('q', termo);
@@ -494,7 +498,42 @@
         }).catch(function (erro) {
             console.error('[leitor] backend de anime indisponivel:', erro);
             $('#resultados').innerHTML = '';
-            status('O módulo de anime precisa do servidor local rodando: node server.js', true);
+            status('Não foi possível carregar os animes. Tente novamente.', true);
+        });
+    }
+
+    var paginaLancamentos = 0;
+    var lancamentosVistos = new Set();
+    function buscarLancamentos(acumular) {
+        var pagina = acumular ? paginaLancamentos + 1 : 1;
+        var container = $('#resultados');
+        $('#anime-feed-title').hidden = false;
+        container.classList.add('episode-grid');
+        if (!acumular) { container.innerHTML = ''; lancamentosVistos.clear(); }
+        var old = $('#btn-mais');
+        if (old) old.remove();
+        status('Carregando últimos episódios…');
+        return apiAnime('/lancamentos?pagina=' + pagina).then(function (dados) {
+            (dados.episodios || []).forEach(function (ep) {
+                if (lancamentosVistos.has(ep.id)) return;
+                lancamentosVistos.add(ep.id);
+                var cover = el('span', { class: 'episode-cover' }, [
+                    el('span', { class: 'episode-play', text: '▶', 'aria-hidden': 'true' }),
+                    el('span', { class: 'episode-number', text: 'EP ' + ep.numero })
+                ]);
+                if (ep.capa) cover.prepend(el('img', { src: ep.capa, alt: '', loading: 'lazy', decoding: 'async' }));
+                container.appendChild(el('a', { class: 'episode-card', href: '/leitor.html?episodio=' + ep.id }, [
+                    cover, el('span', { class: 'episode-title', text: ep.titulo }),
+                    el('span', { class: 'episode-series', text: 'Episódio ' + ep.numero }),
+                    el('span', { class: 'episode-watch', text: 'Assistir episódio →' })
+                ]));
+            });
+            paginaLancamentos = pagina;
+            status(lancamentosVistos.size ? lancamentosVistos.size + ' episódios · Animes Digital' : 'Nenhum episódio disponível agora.');
+            if (dados.mais) container.parentNode.appendChild(el('button', { type: 'button', id: 'btn-mais', class: 'btn-secundario btn-mais', text: 'Carregar mais episódios', onclick: function () { buscarLancamentos(true); } }));
+        }).catch(function () {
+            status('Não foi possível carregar os episódios. Tente novamente.', true);
+            container.parentNode.appendChild(el('button', { type: 'button', id: 'btn-mais', class: 'btn-secundario btn-mais', text: 'Tentar novamente', onclick: function () { buscarLancamentos(acumular); } }));
         });
     }
 
@@ -734,7 +773,9 @@
     }
 
     function renderObras(obras, termo, acumular) {
+        $('#anime-feed-title').hidden = true;
         var container = $('#resultados');
+        container.classList.remove('episode-grid');
 
         if (!acumular) {
             container.innerHTML = '';
@@ -1477,6 +1518,20 @@
         var obra = params.get('obra');
         var cap = params.get('cap');
         var slugTipo = params.get('tipo');
+
+        var episodioId = params.get('episodio');
+        if (episodioId) {
+            status('Abrindo episódio…');
+            return apiAnime('/episodio?id=' + encodeURIComponent(episodioId)).then(function (d) {
+                if (!d.slug) throw new Error('Episódio indisponível');
+                var a = { id: 'animesdigital:' + d.slug, fonte: 'animesdigital', fonteNome: 'Animes Digital', slug: d.slug, titulo: d.slug.replace(/-/g, ' ') };
+                return abrirObraAnime({ obr_id: a.id, anime: a }).then(function () {
+                    var cap = estado.capitulos.find(function (c) { return c.cap_url.replace(/\/$/, '') === d.url.replace(/\/$/, ''); });
+                    if (!cap) throw new Error('Episódio indisponível');
+                    return abrirCapitulo(cap);
+                });
+            }).catch(function () { mostrar('busca'); status('Não foi possível abrir este episódio. Tente novamente.', true); });
+        }
 
         var animeId = params.get('anime');
         if (animeId) {

@@ -12,6 +12,7 @@ import { createDecipheriv } from 'node:crypto';
 import auth from './auth';
 import loobyt from './loobyt';
 import mangadash from './mangadash';
+import digital from './animesdigital';
 
 const FONTES = [
     {
@@ -554,7 +555,9 @@ async function tratar(request, env) {
                 return json({ fontes });
             }
 
-            if (p === '/api/anime/busca') {
+            if (p === '/api/anime/lancamentos' || p === '/api/anime/episodio') return comSeguranca(await digital.tratar(url));
+
+        if (p === '/api/anime/busca') {
                 const doCache = await doEdge(request);
                 if (doCache) return doCache;
                 const termo = url.searchParams.get('q') || '';

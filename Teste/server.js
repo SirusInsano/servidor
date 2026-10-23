@@ -29,6 +29,7 @@ try {
 // Cliente do Loobyt (ex-NoxManga) - API assinada
 const loobyt = require('./loobyt');
 const mangadash = require('./mangadash');
+const digital = require('./animesdigital');
 
 // Contas, comentarios e historico
 const auth = require('./auth');
@@ -665,6 +666,8 @@ const servidor = http.createServer(async (req, res) => {
             }, estadoFonte[f.id] || { ok: null, total: 0, erro: null }));
             return responderJson(res, { fontes });
         }
+
+        if (p === '/api/anime/lancamentos' || p === '/api/anime/episodio') return responderWeb(res, await digital.tratar(u));
 
         if (p === '/api/anime/busca') {
             const termo = u.searchParams.get('q') || '';
